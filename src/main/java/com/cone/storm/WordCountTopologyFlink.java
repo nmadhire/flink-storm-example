@@ -49,7 +49,7 @@ public class WordCountTopologyFlink {
             //sleep
             Thread.sleep(10000);
             //shut down the cluster
-            cluster.shutdown();
+            //cluster.shutdown();
         }
     }
 }
