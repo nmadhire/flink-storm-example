@@ -3,9 +3,12 @@ package com.cone.storm;
 import backtype.storm.Config;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
+import backtype.storm.tuple.Tuple;
 import org.apache.flink.storm.api.FlinkLocalCluster;
 import org.apache.flink.storm.api.FlinkSubmitter;
 import org.apache.flink.storm.api.FlinkTopology;
+import org.apache.flink.storm.util.BoltFileSink;
+import org.apache.flink.storm.util.OutputFormatter;
 
 public class WordCountTopologyFlink {
 
@@ -24,7 +27,13 @@ public class WordCountTopologyFlink {
         //ensures that the same word is sent to the same instance (group by field 'word')
         builder.setBolt("count", new WordCount(), 6).fieldsGrouping("split", new Fields("word"));
 
-        builder.setBolt("printmsg", new PrintingBolt(), 1).shuffleGrouping("count");
+        builder.setBolt("writeIntoFile", new BoltFileSink("/tmp/wordcount.txt", new
+                OutputFormatter() {
+                    @Override
+                    public String format(Tuple tuple) {
+                        return tuple.toString();
+                    }
+                }), 1).shuffleGrouping("count");
 
         //new configuration
         Config conf = new Config();

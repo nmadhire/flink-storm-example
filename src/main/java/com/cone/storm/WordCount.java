@@ -7,6 +7,9 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +30,18 @@ public class WordCount extends BaseBasicBolt {
         //Increment the count and store it
         count++;
         counts.put(word, count);
+
+
+        OutputStream o;
+        try {
+            o = new FileOutputStream("/tmp/wordcount1.txt", true);
+            o.write((word + " " + count.toString() + "\n").getBytes());
+            o.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
         //Emit the word and the current count
         collector.emit(new Values(word, count));
     }
